@@ -11,6 +11,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class UserServices {
 
@@ -29,6 +31,13 @@ public class UserServices {
         logger.info("Creating one user");
 
         return dto;
+    }
+
+    public List<UserResponseDTO> listUsers(){
+
+        var users = toDTOList(repository.findAll());
+
+        return users;
     }
 
     private User toEntity(UserRequestDTO dto) {
@@ -56,6 +65,18 @@ public class UserServices {
         dto.setAccess(user.getAccess());
         dto.setRole(user.getRole().getRole());
         return dto;
+    }
+
+    public List<UserResponseDTO> toDTOList(List<User> users) {
+        return users.stream()
+                .map(this::toDTO)
+                .toList();
+    }
+
+    public List<User> toEntityList(List<UserRequestDTO> dtos) {
+        return dtos.stream()
+                .map(this::toEntity)
+                .toList();
     }
 
 }

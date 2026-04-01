@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity(name = "user")
-@Table(name = "user")
+@Table(name = "users")
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
@@ -35,7 +35,7 @@ public class User {
     private Boolean access;
 
     @ManyToOne
-    @JoinColumn(name = "role_idrole", nullable = false)
+    @JoinColumn(name = "role_id", nullable = false)
     private Role role;
 
 }

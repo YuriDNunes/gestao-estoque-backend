@@ -27,15 +27,15 @@ public class History {
     private LocalDateTime dateAction;
 
     @ManyToOne
-    @JoinColumn(name = "product_idproduct", nullable = false)
+    @JoinColumn(name = "product_id", nullable = false)
     private Product product;
 
     @ManyToOne
-    @JoinColumn(name = "action_idaction", nullable = false)
+    @JoinColumn(name = "action_id", nullable = false)
     private Action action;
 
     @ManyToOne
-    @JoinColumn(name = "user_iduser", nullable = false)
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
 }

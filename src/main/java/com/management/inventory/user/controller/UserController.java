@@ -25,4 +25,9 @@ public class UserController {
         return services.listUsers();
     }
 
+    @PutMapping(value = "/{id}")
+    public UserResponseDTO updateUser(@PathVariable Long id, @RequestBody UserRequestDTO user){
+        return services.updateUser(id, user);
+    }
+
 }

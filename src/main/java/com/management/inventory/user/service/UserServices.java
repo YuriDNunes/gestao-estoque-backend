@@ -40,6 +40,24 @@ public class UserServices {
         return users;
     }
 
+    public UserResponseDTO updateUser(Long id, UserRequestDTO user){
+
+        var entity = repository.findById(id)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        entity.setName(user.getName());
+        entity.setEmail(user.getEmail());
+        entity.setRegister(user.getRegister());
+        entity.setAccess(user.getAccess());
+
+        Role role = repositoryRole.findByRole(user.getRole());
+        entity.setRole(role);
+
+        repository.save(entity);
+
+        return toDTO(entity);
+    }
+
     private User toEntity(UserRequestDTO dto) {
         User user = new User();
         user.setName(dto.getName());
@@ -48,9 +66,7 @@ public class UserServices {
         user.setRegister(dto.getRegister());
         user.setAccess(dto.getAccess());
 
-        Role role = repositoryRole.findById(Long.valueOf(dto.getRole()))
-                .orElseThrow(() -> new RuntimeException("Role not found"));
-
+        Role role = repositoryRole.findByRole((dto.getRole()));
         user.setRole(role);
 
         return user;

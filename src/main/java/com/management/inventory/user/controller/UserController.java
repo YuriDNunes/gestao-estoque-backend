@@ -4,6 +4,7 @@ import com.management.inventory.user.dto.UserRequestDTO;
 import com.management.inventory.user.dto.UserResponseDTO;
 import com.management.inventory.user.service.UserServices;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -28,6 +29,12 @@ public class UserController {
     @PutMapping(value = "/{id}")
     public UserResponseDTO updateUser(@PathVariable Long id, @RequestBody UserRequestDTO user){
         return services.updateUser(id, user);
+    }
+
+    @DeleteMapping(value = "/{id}")
+    public ResponseEntity<?> delete(@PathVariable Long id){
+        services.deleteUser(id);
+        return ResponseEntity.ok().build();
     }
 
 }

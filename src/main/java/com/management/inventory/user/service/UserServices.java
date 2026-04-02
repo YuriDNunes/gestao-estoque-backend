@@ -58,6 +58,14 @@ public class UserServices {
         return toDTO(entity);
     }
 
+    public void deleteUser(Long id){
+
+        User entity = repository.findById(id)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        repository.delete(entity);
+    }
+
     private User toEntity(UserRequestDTO dto) {
         User user = new User();
         user.setName(dto.getName());

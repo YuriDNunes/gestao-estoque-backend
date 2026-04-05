@@ -25,22 +25,24 @@ public class UserServices {
     private RoleRepository repositoryRole;
 
     public UserResponseDTO create(UserRequestDTO user){
+        logger.info("Creating one user");
         var entity = toEntity(user);
 
         var dto = toDTO(repository.save(entity));
-        logger.info("Creating one user");
+
 
         return dto;
     }
 
     public List<UserResponseDTO> listUsers(){
-
+        logger.info("Listing all users");
         var users = toDTOList(repository.findAll());
 
         return users;
     }
 
     public UserResponseDTO updateUser(Long id, UserRequestDTO user){
+        logger.info("Updating one user");
 
         var entity = repository.findById(id)
                 .orElseThrow(() -> new RuntimeException("User not found"));
@@ -59,6 +61,7 @@ public class UserServices {
     }
 
     public void deleteUser(Long id){
+        logger.info("Deleting one user");
 
         User entity = repository.findById(id)
                 .orElseThrow(() -> new RuntimeException("User not found"));

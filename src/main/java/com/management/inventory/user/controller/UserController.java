@@ -18,8 +18,8 @@
         private UserServices services;
 
         @PostMapping
-        public UserResponseDTO createUser(@RequestBody UserRequestDTO user){
-            return services.create(user);
+        public ResponseEntity<UserResponseDTO> createUser(@RequestBody UserRequestDTO user){
+            return ResponseEntity.status(201).body(services.create(user));
         }
 
         @GetMapping

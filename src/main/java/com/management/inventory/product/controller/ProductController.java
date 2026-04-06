@@ -7,6 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/product")
 @CrossOrigin(origins = "http://localhost:5173")
@@ -23,6 +25,11 @@ public class ProductController {
     @PutMapping(value = "/{id}")
     public ProductResponseDTO updateProduct(@PathVariable Long id, @RequestBody ProductRequestDTO product){
         return services.updateProduct(id, product);
+    }
+
+    @GetMapping
+    public List<ProductResponseDTO> listAllProducts(){
+        return services.listAllProducts();
     }
 
 }

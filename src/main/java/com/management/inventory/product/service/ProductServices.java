@@ -1,0 +1,49 @@
+package com.management.inventory.product.service;
+
+import com.management.inventory.product.dto.ProductRequestDTO;
+import com.management.inventory.product.dto.ProductResponseDTO;
+import com.management.inventory.product.entity.Product;
+import com.management.inventory.product.repository.ProductRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+@Service
+public class ProductServices {
+
+    private Logger logger = LoggerFactory.getLogger(ProductServices.class.getName());
+
+    @Autowired
+    private ProductRepository repository;
+
+    public ProductResponseDTO createProduct(ProductRequestDTO product){
+        logger.info("Creating one product");
+
+        var entity = toEntity(product);
+
+        var dto = toDTO(repository.save(entity));
+
+        return dto;
+    }
+
+    private Product toEntity(ProductRequestDTO dto){
+        Product product = new Product();
+        product.setCode(dto.getCode());
+        product.setName(dto.getName());
+        product.setQuantity(dto.getQuantity());
+
+        return product;
+    }
+
+    private ProductResponseDTO toDTO(Product product){
+        ProductResponseDTO dto = new ProductResponseDTO();
+        dto.setId(product.getId());
+        dto.setCode(product.getCode());
+        dto.setName(product.getName());
+        dto.setQuantity(product.getQuantity());
+
+        return dto;
+    }
+
+}

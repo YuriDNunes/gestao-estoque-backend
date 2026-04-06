@@ -50,6 +50,15 @@ public class ProductServices {
         return toDTOList(repository.findAll());
     }
 
+    public void deleteProduct(Long id){
+        logger.info("Deleting one product");
+
+        var entity = repository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Produto não encontrado"));
+
+        repository.delete(entity);
+    }
+
     private Product toEntity(ProductRequestDTO dto){
         Product product = new Product();
         product.setCode(dto.getCode());

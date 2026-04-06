@@ -9,6 +9,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class ProductServices {
 
@@ -42,6 +44,12 @@ public class ProductServices {
         return toDTO(entity);
     }
 
+    public List<ProductResponseDTO> listAllProducts(){
+        logger.info("Listing all products");
+
+        return toDTOList(repository.findAll());
+    }
+
     private Product toEntity(ProductRequestDTO dto){
         Product product = new Product();
         product.setCode(dto.getCode());
@@ -59,6 +67,12 @@ public class ProductServices {
         dto.setQuantity(product.getQuantity());
 
         return dto;
+    }
+
+    public List<ProductResponseDTO> toDTOList(List<Product> products) {
+        return products.stream()
+                .map(this::toDTO)
+                .toList();
     }
 
 }

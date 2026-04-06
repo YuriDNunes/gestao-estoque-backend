@@ -4,10 +4,8 @@ import com.management.inventory.product.dto.ProductRequestDTO;
 import com.management.inventory.product.dto.ProductResponseDTO;
 import com.management.inventory.product.service.ProductServices;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/product")
@@ -17,8 +15,9 @@ public class ProductController {
     @Autowired
     private ProductServices services;
 
-    public ProductResponseDTO createProduct(@RequestBody ProductRequestDTO product){
-        return services.createProduct(product);
+    @PostMapping
+    public ResponseEntity<ProductResponseDTO> createProduct(@RequestBody ProductRequestDTO product){
+        return ResponseEntity.status(201).body(services.createProduct(product));
     }
 
 }

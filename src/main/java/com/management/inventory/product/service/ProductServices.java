@@ -27,6 +27,21 @@ public class ProductServices {
         return dto;
     }
 
+    public ProductResponseDTO updateProduct(Long id, ProductRequestDTO product){
+        logger.info("Updating one product");
+
+        var entity = repository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Product not found"));
+
+        entity.setCode(product.getCode());
+        entity.setName(product.getName());
+        entity.setQuantity(product.getQuantity());
+
+        repository.save(entity);
+
+        return toDTO(entity);
+    }
+
     private Product toEntity(ProductRequestDTO dto){
         Product product = new Product();
         product.setCode(dto.getCode());

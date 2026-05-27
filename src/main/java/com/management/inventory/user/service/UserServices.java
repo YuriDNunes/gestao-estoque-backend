@@ -1,17 +1,19 @@
 package com.management.inventory.user.service;
 
+import java.util.List;
+
+import jakarta.transaction.Transactional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import com.management.inventory.auth.entity.Role;
 import com.management.inventory.auth.repository.RoleRepository;
 import com.management.inventory.user.dto.UserRequestDTO;
 import com.management.inventory.user.dto.UserResponseDTO;
 import com.management.inventory.user.entity.User;
 import com.management.inventory.user.repository.UserRepository;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Service
 public class UserServices {
@@ -24,6 +26,7 @@ public class UserServices {
     @Autowired
     private RoleRepository repositoryRole;
 
+    @Transactional
     public UserResponseDTO create(UserRequestDTO user){
         logger.info("Creating one user");
         var entity = toEntity(user);
@@ -34,13 +37,14 @@ public class UserServices {
         return dto;
     }
 
-    public List<UserResponseDTO> listUsers(){
+    public List<UserResponseDTO> listUsers(String role){
         logger.info("Listing all users");
-        var users = toDTOList(repository.findAll());
+        var users = toDTOList(repository.findByRole_RoleAndIsDeletedFalse(role));
 
         return users;
     }
 
+    @Transactional
     public UserResponseDTO updateUser(Long id, UserRequestDTO user){
         logger.info("Updating one user");
 
@@ -60,13 +64,26 @@ public class UserServices {
         return toDTO(entity);
     }
 
+    @Transactional
     public void deleteUser(Long id){
         logger.info("Deleting one user");
 
         User entity = repository.findById(id)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        repository.delete(entity);
+        entity.setIsDeleted(true);
+        repository.save(entity);
+    }
+
+    @Transactional
+    public UserResponseDTO updateAccess(Long id, Boolean access){
+        logger.info("Updating user access");
+
+        var entity = repository.findById(id)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        entity.setAccess(access);
+        repository.save(entity);
+        return toDTO(entity);
     }
 
     private User toEntity(UserRequestDTO dto) {
@@ -97,12 +114,6 @@ public class UserServices {
     public List<UserResponseDTO> toDTOList(List<User> users) {
         return users.stream()
                 .map(this::toDTO)
-                .toList();
-    }
-
-    public List<User> toEntityList(List<UserRequestDTO> dtos) {
-        return dtos.stream()
-                .map(this::toEntity)
                 .toList();
     }
 

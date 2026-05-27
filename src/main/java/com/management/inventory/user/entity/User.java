@@ -38,4 +38,7 @@ public class User {
     @JoinColumn(name = "role_id", nullable = false)
     private Role role;
 
+    @Column(name = "is_deleted", nullable = false)
+    private Boolean isDeleted = false;
+
 }

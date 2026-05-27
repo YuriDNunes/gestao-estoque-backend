@@ -4,6 +4,7 @@ import com.management.inventory.product.dto.ProductRequestDTO;
 import com.management.inventory.product.dto.ProductResponseDTO;
 import com.management.inventory.product.entity.Product;
 import com.management.inventory.product.repository.ProductRepository;
+import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +20,7 @@ public class ProductServices {
     @Autowired
     private ProductRepository repository;
 
+    @Transactional
     public ProductResponseDTO createProduct(ProductRequestDTO product){
         logger.info("Creating one product");
 
@@ -29,6 +31,7 @@ public class ProductServices {
         return dto;
     }
 
+    @Transactional
     public ProductResponseDTO updateProduct(Long id, ProductRequestDTO product){
         logger.info("Updating one product");
 
@@ -50,6 +53,7 @@ public class ProductServices {
         return toDTOList(repository.findAll());
     }
 
+    @Transactional
     public void deleteProduct(Long id){
         logger.info("Deleting one product");
 

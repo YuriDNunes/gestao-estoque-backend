@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.management.inventory.auth.entity.Role;
@@ -28,6 +29,12 @@ public class UserServices implements UserDetailsService {
 
     @Autowired
     private RoleRepository repositoryRole;
+
+    private PasswordEncoder passwordEncoder;
+
+    public UserServices(PasswordEncoder passwordEncoder) {
+        this.passwordEncoder = passwordEncoder;
+    }
 
     @Transactional
     public UserResponseDTO create(UserRequestDTO user){
@@ -99,7 +106,7 @@ public class UserServices implements UserDetailsService {
         User user = new User();
         user.setName(dto.getName());
         user.setEmail(dto.getEmail());
-        user.setPassword(dto.getPassword());
+        user.setPassword(passwordEncoder.encode(dto.getPassword()));
         user.setRegister(dto.getRegister());
         user.setAccess(dto.getAccess());
 

@@ -6,6 +6,9 @@ import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import com.management.inventory.auth.entity.Role;
@@ -16,7 +19,7 @@ import com.management.inventory.user.entity.User;
 import com.management.inventory.user.repository.UserRepository;
 
 @Service
-public class UserServices {
+public class UserServices implements UserDetailsService {
 
     private Logger logger = LoggerFactory.getLogger(UserServices.class.getName());
 
@@ -84,6 +87,12 @@ public class UserServices {
         entity.setAccess(access);
         repository.save(entity);
         return toDTO(entity);
+    }
+
+
+    @Override
+    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+        return repository.findByEmail(email).orElseThrow(() -> new UsernameNotFoundException("Username not found!"));
     }
 
     private User toEntity(UserRequestDTO dto) {

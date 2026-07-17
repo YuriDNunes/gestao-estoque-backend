@@ -29,6 +29,6 @@ public class AuthController {
     }
 
     private static boolean credentialsIsInvalid(AccountCredentialsDTO credentials) {
-        return credentials == null || !StringUtils.hasText(credentials.getPasssword()) || !StringUtils.hasText(credentials.getUsername());
+        return credentials == null || !StringUtils.hasText(credentials.getPassword()) || !StringUtils.hasText(credentials.getUsername());
     }
 }

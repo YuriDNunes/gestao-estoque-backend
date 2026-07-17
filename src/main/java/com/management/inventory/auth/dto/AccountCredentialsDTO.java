@@ -5,7 +5,7 @@ import java.util.Objects;
 public class AccountCredentialsDTO {
 
     private String username;
-    private String passsword;
+    private String password;
 
     public AccountCredentialsDTO() {
     }
@@ -18,22 +18,22 @@ public class AccountCredentialsDTO {
         this.username = username;
     }
 
-    public String getPasssword() {
-        return passsword;
+    public String getPassword() {
+        return password;
     }
 
-    public void setPasssword(String passsword) {
-        this.passsword = passsword;
+    public void setPassword(String passsword) {
+        this.password = passsword;
     }
 
     @Override
     public boolean equals(Object o) {
         if (!(o instanceof AccountCredentialsDTO that)) return false;
-        return Objects.equals(getUsername(), that.getUsername()) && Objects.equals(getPasssword(), that.getPasssword());
+        return Objects.equals(getUsername(), that.getUsername()) && Objects.equals(getPassword(), that.getPassword());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getUsername(), getPasssword());
+        return Objects.hash(getUsername(), getPassword());
     }
 }

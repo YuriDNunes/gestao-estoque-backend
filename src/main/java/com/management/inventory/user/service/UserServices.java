@@ -2,10 +2,13 @@ package com.management.inventory.user.service;
 
 import java.util.List;
 
+import com.management.inventory.shared.utils.PasswordGeneratorUtil;
 import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -32,17 +35,31 @@ public class UserServices implements UserDetailsService {
 
     private PasswordEncoder passwordEncoder;
 
-    public UserServices(PasswordEncoder passwordEncoder) {
+    private JavaMailSender mailSender;
+
+    public UserServices(PasswordEncoder passwordEncoder, JavaMailSender mailSender) {
         this.passwordEncoder = passwordEncoder;
+        this.mailSender = mailSender;
     }
 
     @Transactional
     public UserResponseDTO create(UserRequestDTO user){
         logger.info("Creating one user");
+
+        var generatedPassword = PasswordGeneratorUtil.generateRandomPassword();
+
+        user.setPassword(generatedPassword);
+
         var entity = toEntity(user);
 
         var dto = toDTO(repository.save(entity));
 
+        SimpleMailMessage mailMessage = new SimpleMailMessage();
+        mailMessage.setTo(dto.getEmail());
+        mailMessage.setSubject("Bem-vindo! Suas credenciais de acesso");
+        mailMessage.setText("Sua senha para entrar no sistema é: " + generatedPassword);
+
+        mailSender.send(mailMessage);
 
         return dto;
     }

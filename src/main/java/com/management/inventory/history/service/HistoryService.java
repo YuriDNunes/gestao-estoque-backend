@@ -6,11 +6,10 @@ import com.management.inventory.history.entity.History;
 import com.management.inventory.history.repository.HistoryRepository;
 import com.management.inventory.product.entity.Product;
 import com.management.inventory.product.repository.ProductRepository;
-import com.management.inventory.shared.repository.ActionRepository;
+import com.management.inventory.shared.entity.ActionEnum;
 import com.management.inventory.user.entity.User;
 import com.management.inventory.user.repository.UserRepository;
 import jakarta.transaction.Transactional;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -21,17 +20,14 @@ public class HistoryService {
     private HistoryRepository historyRepository;
     private ProductRepository productRepository;
     private UserRepository userRepository;
-    private ActionRepository actionRepository;
 
     public HistoryService(HistoryRepository historyRepository,
                           ProductRepository productRepository,
-                          UserRepository userRepository,
-                          ActionRepository actionRepository
+                          UserRepository userRepository
     ) {
         this.historyRepository = historyRepository;
         this.productRepository = productRepository;
         this.userRepository = userRepository;
-        this.actionRepository = actionRepository;
     }
 
     @Transactional
@@ -47,9 +43,6 @@ public class HistoryService {
 
         product.setQuantity(product.getQuantity() - request.getQuantity());
 
-        var action = actionRepository.findById(1L)
-                .orElseThrow(() -> new Exception("Ação não encontrada!"));
-
         History history = new History();
 
         LocalDateTime now = LocalDateTime.now();
@@ -57,7 +50,7 @@ public class HistoryService {
         history.setDateAction(now);
         history.setProduct(product);
         history.setUser(user);
-        history.setAction(action);
+        history.setAction(ActionEnum.WITHDRAWAL);
         history.setQuantity(request.getQuantity());
 
         history = historyRepository.save(history);
@@ -69,7 +62,7 @@ public class HistoryService {
         response.setProductName(history.getProduct().getName());
         response.setQuantity(history.getQuantity());
         response.setDateAction(history.getDateAction());
-        response.setActionName(history.getAction().getAction());
+        response.setActionName(history.getAction().name());
 
         return response;
     }

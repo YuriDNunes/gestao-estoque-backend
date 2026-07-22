@@ -1,7 +1,7 @@
 package com.management.inventory.history.entity;
 
 import com.management.inventory.product.entity.Product;
-import com.management.inventory.shared.entity.Action;
+import com.management.inventory.shared.entity.ActionEnum;
 import com.management.inventory.user.entity.User;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -30,9 +30,9 @@ public class History {
     @JoinColumn(name = "product_id", nullable = false)
     private Product product;
 
-    @ManyToOne
-    @JoinColumn(name = "action_id", nullable = false)
-    private Action action;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private ActionEnum action;
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)

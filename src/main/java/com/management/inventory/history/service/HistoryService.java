@@ -64,6 +64,7 @@ public class HistoryService {
 
         HistoryResponseDTO response = new HistoryResponseDTO();
 
+        response.setId(history.getId());
         response.setUserName(history.getUser().getName());
         response.setProductName(history.getProduct().getName());
         response.setQuantity(history.getQuantity());

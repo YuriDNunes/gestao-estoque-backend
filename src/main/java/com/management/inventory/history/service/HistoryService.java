@@ -66,4 +66,39 @@ public class HistoryService {
 
         return response;
     }
+
+    @Transactional
+    public HistoryResponseDTO registerReturn(HistoryRequestDTO request) throws Exception {
+
+        User user = userRepository.findById(request.getUserId())
+                .orElseThrow(() -> new Exception("Usuário não encontrado!"));
+
+        Product product = productRepository.findById(request.getProductId())
+                .orElseThrow(() -> new Exception("Produto não encontrado!"));
+
+        product.setQuantity(request.getQuantity() + product.getQuantity());
+
+        History history = new History();
+
+        LocalDateTime now = LocalDateTime.now();
+
+        history.setDateAction(now);
+        history.setProduct(product);
+        history.setUser(user);
+        history.setAction(ActionEnum.RETURN);
+        history.setQuantity(request.getQuantity());
+
+        history = historyRepository.save(history);
+
+        HistoryResponseDTO response = new HistoryResponseDTO();
+
+        response.setId(history.getId());
+        response.setUserName(history.getUser().getName());
+        response.setProductName(history.getProduct().getName());
+        response.setQuantity(history.getQuantity());
+        response.setDateAction(history.getDateAction());
+        response.setActionName(history.getAction().name());
+
+        return response;
+    }
 }

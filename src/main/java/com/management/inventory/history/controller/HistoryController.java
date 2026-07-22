@@ -25,4 +25,10 @@ public class HistoryController {
         HistoryResponseDTO response = historyService.registerWithdrawal(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
+
+    @PostMapping("/return")
+    public ResponseEntity<HistoryResponseDTO> registerReturn(@RequestBody HistoryRequestDTO request) throws Exception {
+        HistoryResponseDTO response = historyService.registerReturn(request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
 }

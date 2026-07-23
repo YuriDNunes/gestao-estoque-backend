@@ -47,7 +47,7 @@ public class SecurityConfig {
                                     "/auth/refresh/**"
                             ).permitAll()
                             .requestMatchers("/api/user/**").hasAnyAuthority("ROLE_Admin", "ROLE_Gestor")
-                            .requestMatchers("api/product/**", "api/history/").hasAnyAuthority("ROLE_Admin", "ROLE_Gestor", "ROLE_Usuário")
+                            .requestMatchers("/api/product/**", "/api/history/").hasAnyAuthority("ROLE_Admin", "ROLE_Gestor", "ROLE_Usuário")
                             .requestMatchers("/api/**").authenticated()
                             .anyRequest().authenticated()
                 )

@@ -2,8 +2,10 @@ package com.management.inventory.product.controller;
 
 import com.management.inventory.product.dto.ProductRequestDTO;
 import com.management.inventory.product.dto.ProductResponseDTO;
+import com.management.inventory.product.dto.ProductStockRequestDTO;
 import com.management.inventory.product.service.ProductServices;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -35,6 +37,11 @@ public class ProductController {
     public ResponseEntity<?> deleteProduct(@PathVariable Long id){
         services.deleteProduct(id);
         return ResponseEntity.ok().build();
+    }
+
+    @PatchMapping("/{id}/stock")
+    public ResponseEntity<ProductResponseDTO> stockAction(@PathVariable Long id, @RequestBody ProductStockRequestDTO request){
+        return ResponseEntity.ok(services.stockAction(id, request));
     }
 
 }

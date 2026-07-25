@@ -2,6 +2,7 @@ package com.management.inventory.product.service;
 
 import com.management.inventory.product.dto.ProductRequestDTO;
 import com.management.inventory.product.dto.ProductResponseDTO;
+import com.management.inventory.product.dto.ProductStockRequestDTO;
 import com.management.inventory.product.entity.Product;
 import com.management.inventory.product.repository.ProductRepository;
 import jakarta.transaction.Transactional;
@@ -61,6 +62,23 @@ public class ProductServices {
                 .orElseThrow(() -> new RuntimeException("Produto não encontrado"));
 
         repository.delete(entity);
+    }
+
+    @Transactional
+    public ProductResponseDTO stockAction(Long id, ProductStockRequestDTO request){
+
+        Product product = repository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Não foi possivel encontrar o produto"));
+
+        if ((product.getQuantity() + request.getQuantity()) < 0) throw new IllegalArgumentException("Estoque insuficiente");
+
+        product.setQuantity(product.getQuantity() + request.getQuantity());
+
+        repository.save(product);
+
+        ProductResponseDTO dto = toDTO(product);
+
+        return dto;
     }
 
     private Product toEntity(ProductRequestDTO dto){

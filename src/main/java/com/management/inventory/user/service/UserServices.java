@@ -7,6 +7,7 @@ import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -66,7 +67,7 @@ public class UserServices implements UserDetailsService {
 
     public List<UserResponseDTO> listUsers(String role){
         logger.info("Listing all users");
-        var users = toDTOList(repository.findByRole_RoleAndIsDeletedFalse(role));
+        var users = toDTOList(repository.findByRole_RoleAndIsDeletedFalse(role, Sort.by(Sort.Direction.ASC, "register")));
 
         return users;
     }

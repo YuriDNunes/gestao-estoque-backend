@@ -9,6 +9,7 @@ import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -51,7 +52,7 @@ public class ProductServices {
     public List<ProductResponseDTO> listAllProducts(){
         logger.info("Listing all products");
 
-        return toDTOList(repository.findAll());
+        return toDTOList(repository.findAll(Sort.by(Sort.Direction.ASC, "code")));
     }
 
     @Transactional

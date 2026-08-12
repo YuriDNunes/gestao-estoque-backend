@@ -5,10 +5,9 @@ import com.management.inventory.productAllocation.dto.ProductAllocationResponseD
 import com.management.inventory.productAllocation.service.ProductAllocationService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/allocation")
@@ -23,6 +22,21 @@ public class ProductAllocationController {
     @PostMapping
     public ResponseEntity<ProductAllocationResponseDTO> allocate(@RequestBody ProductAllocationRequestDTO request){
         return ResponseEntity.status(HttpStatus.CREATED).body(service.allocate(request));
+    }
+
+    @GetMapping
+    public ResponseEntity<List<ProductAllocationResponseDTO>> listMyAllocations(){
+        return ResponseEntity.status(HttpStatus.OK).body(service.listMyAllocations());
+    }
+
+    @PostMapping("/{id}/return")
+    public ResponseEntity<Void> returnAllocation(
+            @PathVariable("id") Long id,
+            @RequestBody ProductAllocationRequestDTO request
+    ) {
+        service.returnAllocation(id, request.getQuantity());
+
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
 }

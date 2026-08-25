@@ -1,11 +1,14 @@
 package com.management.inventory.productAllocation.service;
 
+import com.management.inventory.history.entity.History;
+import com.management.inventory.history.repository.HistoryRepository;
 import com.management.inventory.product.entity.Product;
 import com.management.inventory.product.repository.ProductRepository;
 import com.management.inventory.productAllocation.dto.ProductAllocationRequestDTO;
 import com.management.inventory.productAllocation.dto.ProductAllocationResponseDTO;
 import com.management.inventory.productAllocation.entity.ProductAllocation;
 import com.management.inventory.productAllocation.repository.ProductAllocationRepository;
+import com.management.inventory.shared.entity.ActionEnum;
 import com.management.inventory.user.entity.User;
 import com.management.inventory.user.repository.UserRepository;
 import jakarta.transaction.Transactional;
@@ -21,11 +24,16 @@ public class ProductAllocationService {
     private ProductAllocationRepository repository;
     private ProductRepository productRepository;
     private UserRepository userRepository;
+    private HistoryRepository historyRepository;
 
-    public ProductAllocationService(ProductAllocationRepository repository, ProductRepository productRepository, UserRepository userRepository) {
+    public ProductAllocationService(ProductAllocationRepository repository,
+                                    ProductRepository productRepository,
+                                    UserRepository userRepository,
+                                    HistoryRepository historyRepository) {
         this.repository = repository;
         this.productRepository = productRepository;
         this.userRepository = userRepository;
+        this.historyRepository = historyRepository;
     }
 
     @Transactional
@@ -38,13 +46,16 @@ public class ProductAllocationService {
 
         product.setQuantity(product.getQuantity() - request.getQuantity());
 
-        User user = userRepository.findById(request.getUserId())
+        User user = userRepository.findById(request.getTargetUserId())
                 .orElseThrow(() -> new RuntimeException("Não foi possivel encontrar o usuário"));
+
+        String managerEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+        User manager = userRepository.findByEmail(managerEmail)
+                .orElseThrow(() -> new RuntimeException("Gestor autenticado não encontrado"));
 
         LocalDateTime now = LocalDateTime.now();
 
         ProductAllocation productAllocation = new ProductAllocation();
-
         productAllocation.setAllocatedQuantity(request.getQuantity());
         productAllocation.setAllocationDate(now);
         productAllocation.setProduct(product);
@@ -52,8 +63,17 @@ public class ProductAllocationService {
 
         repository.save(productAllocation);
 
-        ProductAllocationResponseDTO response = new ProductAllocationResponseDTO();
+        History history = new History();
+        history.setDateAction(now);
+        history.setProduct(product);
+        history.setTargetUser(user);
+        history.setManager(manager);
+        history.setAction(ActionEnum.ALLOCATION);
+        history.setQuantity(request.getQuantity());
 
+        historyRepository.save(history);
+
+        ProductAllocationResponseDTO response = new ProductAllocationResponseDTO();
         response.setId(productAllocation.getId());
         response.setUsername(productAllocation.getUser().getName());
         response.setProductName(productAllocation.getProduct().getName());
@@ -108,5 +128,4 @@ public class ProductAllocationService {
             repository.save(allocation);
         }
     }
-
 }

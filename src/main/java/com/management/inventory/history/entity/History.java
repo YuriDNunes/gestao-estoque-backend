@@ -8,7 +8,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
 import java.time.LocalDateTime;
 
 @Entity
@@ -35,9 +34,12 @@ public class History {
     private ActionEnum action;
 
     @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+    @JoinColumn(name = "target_user_id", nullable = false)
+    private User targetUser;
+
+    @ManyToOne
+    @JoinColumn(name = "manager_id", nullable = false)
+    private User manager;
 
     private Integer quantity;
-
 }

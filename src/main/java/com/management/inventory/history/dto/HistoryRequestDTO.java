@@ -1,5 +1,4 @@
 package com.management.inventory.history.dto;
-
 import lombok.*;
 
 @NoArgsConstructor
@@ -8,9 +7,8 @@ import lombok.*;
 @Setter
 @EqualsAndHashCode
 public class HistoryRequestDTO {
-
-    private Long userId;
+    private Long targetUserId;
+    private Long managerId;
     private Long productId;
     private Integer quantity;
-
 }

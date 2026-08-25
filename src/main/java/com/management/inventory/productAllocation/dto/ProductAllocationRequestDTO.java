@@ -11,7 +11,7 @@ import lombok.Setter;
 @Setter
 public class ProductAllocationRequestDTO {
 
-    private Long userId;
+    private Long targetUserId;
     private Long productId;
     private Integer quantity;
 

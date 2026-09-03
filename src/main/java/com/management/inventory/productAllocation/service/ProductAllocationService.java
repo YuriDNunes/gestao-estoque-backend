@@ -119,6 +119,18 @@ public class ProductAllocationService {
         product.setQuantity(product.getQuantity() + quantityToReturn);
         productRepository.save(product);
 
+        User actor = userRepository.findByEmail(loggedEmail)
+            .orElseThrow(() -> new RuntimeException("Usuário autenticado não encontrado"));
+
+        History history = new History();
+        history.setDateAction(LocalDateTime.now());
+        history.setProduct(product);
+        history.setTargetUser(allocation.getUser());
+        history.setManager(actor);
+        history.setAction(ActionEnum.RETURN);
+        history.setQuantity(quantityToReturn);
+        historyRepository.save(history);
+
         int remainingQuantity = allocation.getAllocatedQuantity() - quantityToReturn;
 
         if (remainingQuantity == 0) {

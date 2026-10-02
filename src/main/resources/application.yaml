@@ -1,0 +1,29 @@
+cors:
+  originPatterns: "http://localhost:5173"
+security:
+  jwt:
+    token:
+      secret-key: ${secret-key}
+      expire-length: ${expire-length}
+spring:
+  config:
+    import: "file:./.env[.properties]"
+  application:
+    name: inventory-management
+  datasource:
+    url: ${data-base-url}
+    username: ${db-user}
+    password: ${db-password}
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: true
+  mail:
+    host: ${mail-host}
+    port: ${mail-port}
+    username: ${mail-user}
+    password: ${mail-password}
+    properties:
+      mail.smtp.auth: true
+      mail.smtp.starttls.enabled: true
+      mail.smtp.starttls.required: true

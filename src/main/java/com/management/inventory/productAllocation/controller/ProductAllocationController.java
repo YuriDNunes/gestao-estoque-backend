@@ -33,7 +33,7 @@ public class ProductAllocationController {
     public ResponseEntity<Void> returnAllocation(
             @PathVariable("id") Long id,
             @RequestBody ProductAllocationRequestDTO request
-    ) {
+    ){
         service.returnAllocation(id, request.getQuantity());
 
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();

@@ -1,5 +1,9 @@
 package com.management.inventory.productAllocation.service;
 
+import com.management.inventory.exceptions.InsufficientStockException;
+import com.management.inventory.exceptions.InvalidRoleException;
+import com.management.inventory.exceptions.ResourceNotFoundException;
+import com.management.inventory.exceptions.ReturnQuantityExceededException;
 import com.management.inventory.history.entity.History;
 import com.management.inventory.history.repository.HistoryRepository;
 import com.management.inventory.product.entity.Product;
@@ -12,6 +16,7 @@ import com.management.inventory.shared.entity.ActionEnum;
 import com.management.inventory.user.entity.User;
 import com.management.inventory.user.repository.UserRepository;
 import jakarta.transaction.Transactional;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
@@ -40,18 +45,19 @@ public class ProductAllocationService {
     public ProductAllocationResponseDTO allocate(ProductAllocationRequestDTO request){
 
         Product product = productRepository.findById(request.getProductId())
-                .orElseThrow(() -> new RuntimeException("Não foi possivel encontrar o produto"));
+                .orElseThrow(() -> new ResourceNotFoundException("Não foi possivel encontrar o produto"));
 
-        if (product.getQuantity() < request.getQuantity()) throw new RuntimeException("Quantidade do produto não é suficiente");
+        if (product.getQuantity() < request.getQuantity()) throw new InsufficientStockException("Estoque insuficiente");
 
         product.setQuantity(product.getQuantity() - request.getQuantity());
 
         User user = userRepository.findById(request.getTargetUserId())
-                .orElseThrow(() -> new RuntimeException("Não foi possivel encontrar o usuário"));
+                .orElseThrow(() -> new ResourceNotFoundException("Não foi possivel encontrar o usuário"));
 
         String managerEmail = SecurityContextHolder.getContext().getAuthentication().getName();
         User manager = userRepository.findByEmail(managerEmail)
-                .orElseThrow(() -> new RuntimeException("Gestor autenticado não encontrado"));
+                .orElseThrow(() -> new AuthenticationException("Gestor autenticado não encontrado") {
+                });
 
         LocalDateTime now = LocalDateTime.now();
 
@@ -102,17 +108,17 @@ public class ProductAllocationService {
     }
 
     @Transactional
-    public void returnAllocation(Long allocationId, Integer quantityToReturn) {
+    public void returnAllocation(Long allocationId, Integer quantityToReturn){
         ProductAllocation allocation = repository.findById(allocationId)
-                .orElseThrow(() -> new RuntimeException("Alocação não encontrada"));
+                .orElseThrow(() -> new ResourceNotFoundException("Alocação não encontrada"));
 
         String loggedEmail = SecurityContextHolder.getContext().getAuthentication().getName();
         if (!allocation.getUser().getEmail().equals(loggedEmail)) {
-            throw new RuntimeException("Acesso negado: Você não pode devolver produtos de outro usuário.");
+            throw new org.springframework.security.access.AccessDeniedException("Acesso negado: Você não pode devolver produtos de outro usuário.");
         }
 
         if (quantityToReturn > allocation.getAllocatedQuantity()) {
-            throw new RuntimeException("Quantidade de devolução excede o total alocado.");
+            throw new ReturnQuantityExceededException("Quantidade de devolução excede o total alocado.");
         }
 
         Product product = allocation.getProduct();
@@ -120,7 +126,8 @@ public class ProductAllocationService {
         productRepository.save(product);
 
         User actor = userRepository.findByEmail(loggedEmail)
-            .orElseThrow(() -> new RuntimeException("Usuário autenticado não encontrado"));
+            .orElseThrow(() -> new AuthenticationException("Usuário autenticado não encontrado") {
+            });
 
         History history = new History();
         history.setDateAction(LocalDateTime.now());

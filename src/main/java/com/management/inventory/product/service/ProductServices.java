@@ -1,10 +1,15 @@
 package com.management.inventory.product.service;
 
+import com.management.inventory.exceptions.DuplicateResourceException;
+import com.management.inventory.exceptions.InsufficientStockException;
+import com.management.inventory.exceptions.ResourceInUseException;
+import com.management.inventory.exceptions.ResourceNotFoundException;
 import com.management.inventory.product.dto.ProductRequestDTO;
 import com.management.inventory.product.dto.ProductResponseDTO;
 import com.management.inventory.product.dto.ProductStockRequestDTO;
 import com.management.inventory.product.entity.Product;
 import com.management.inventory.product.repository.ProductRepository;
+import com.management.inventory.productAllocation.repository.ProductAllocationRepository;
 import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,11 +27,18 @@ public class ProductServices {
     @Autowired
     private ProductRepository repository;
 
+    @Autowired
+    private ProductAllocationRepository productAllocationRepository;
+
     @Transactional
     public ProductResponseDTO createProduct(ProductRequestDTO product){
         logger.info("Creating one product");
 
         var entity = toEntity(product);
+
+        if (repository.existsByCode(product.getCode())) throw new DuplicateResourceException("Já existe um produto com esse código: " + product.getCode());
+
+        if (repository.existsByName(product.getName())) throw new DuplicateResourceException("Já existe um produto com esse nome: " + product.getName());
 
         var dto = toDTO(repository.save(entity));
 
@@ -38,7 +50,11 @@ public class ProductServices {
         logger.info("Updating one product");
 
         var entity = repository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Product not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Produto: " + product.getName() + " não encontrado"));
+
+        if (repository.existsByCode(entity.getCode()) || repository.existsByName(entity.getName())){
+            throw new DuplicateResourceException("Já exista um produto com esse nome ou código");
+        }
 
         entity.setCode(product.getCode());
         entity.setName(product.getName());
@@ -60,7 +76,11 @@ public class ProductServices {
         logger.info("Deleting one product");
 
         var entity = repository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Produto não encontrado"));
+                .orElseThrow(() -> new ResourceNotFoundException("Produto não encontrado"));
+
+        if (productAllocationRepository.existsByProduct(entity)){
+            throw new ResourceInUseException("Não é possivel excluir produto que esta em uso");
+        }
 
         repository.delete(entity);
     }
@@ -69,9 +89,9 @@ public class ProductServices {
     public ProductResponseDTO stockAction(Long id, ProductStockRequestDTO request){
 
         Product product = repository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Não foi possivel encontrar o produto"));
+                .orElseThrow(() -> new ResourceNotFoundException("Não foi possivel encontrar o produto."));
 
-        if ((product.getQuantity() + request.getQuantity()) < 0) throw new IllegalArgumentException("Estoque insuficiente");
+        if ((product.getQuantity() + request.getQuantity()) < 0) throw new InsufficientStockException("Estoque insuficiente.");
 
         product.setQuantity(product.getQuantity() + request.getQuantity());
 

@@ -13,4 +13,12 @@ import com.management.inventory.user.entity.User;
 public interface UserRepository extends JpaRepository<User, Long> {
     List<User> findByRole_RoleAndIsDeletedFalse(String role, Sort sort);
     Optional<User> findByEmail(String email);
+
+    boolean existsByEmail(String email);
+
+    boolean existsByRegister(String register);
+
+    boolean existsByEmailAndIdNot(String email, Long id);
+
+    boolean existsByRegisterAndIdNot(String register, Long id);
 }

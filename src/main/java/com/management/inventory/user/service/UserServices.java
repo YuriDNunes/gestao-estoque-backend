@@ -2,6 +2,8 @@ package com.management.inventory.user.service;
 
 import java.util.List;
 
+import com.management.inventory.exceptions.DuplicateResourceException;
+import com.management.inventory.exceptions.ResourceNotFoundException;
 import com.management.inventory.shared.utils.PasswordGeneratorUtil;
 import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
@@ -49,6 +51,10 @@ public class UserServices implements UserDetailsService {
 
         var generatedPassword = PasswordGeneratorUtil.generateRandomPassword();
 
+        if (repository.existsByEmail(user.getEmail())) throw new DuplicateResourceException("Já existe um usuário com esse email");
+
+        if (repository.existsByRegister(user.getRegister())) throw new DuplicateResourceException("Já existe um usuário com esse registro");
+
         user.setPassword(generatedPassword);
 
         var entity = toEntity(user);
@@ -77,7 +83,11 @@ public class UserServices implements UserDetailsService {
         logger.info("Updating one user");
 
         var entity = repository.findById(id)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Usuário " + "\"" + user.getName() + "\"" + " não encontrado."));
+
+        if (repository.existsByEmailAndIdNot(user.getEmail(), id)) throw new DuplicateResourceException("Já existe um usuário com esse email");
+
+        if (repository.existsByRegisterAndIdNot(user.getRegister(), id)) throw new DuplicateResourceException("Já existe um usuário com esse registro");
 
         entity.setName(user.getName());
         entity.setEmail(user.getEmail());
@@ -97,7 +107,7 @@ public class UserServices implements UserDetailsService {
         logger.info("Deleting one user");
 
         User entity = repository.findById(id)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado."));
 
         entity.setIsDeleted(true);
         repository.save(entity);
@@ -108,7 +118,7 @@ public class UserServices implements UserDetailsService {
         logger.info("Updating user access");
 
         var entity = repository.findById(id)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado."));
         entity.setAccess(access);
         repository.save(entity);
         return toDTO(entity);

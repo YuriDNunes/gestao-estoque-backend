@@ -36,5 +36,5 @@ out/
 .vscode/
 
 ### Sensitive data ###
-src/main/resources/application.yaml
-!src/main/resources/application-example.yaml
+.env
+.env.*
